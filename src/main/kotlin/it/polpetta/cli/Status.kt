@@ -20,19 +20,23 @@ package it.polpetta.cli
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
-import it.polpetta.utils.Jenkins
+import com.google.inject.Inject
+import it.polpetta.utils.JenkinsSession
 import it.polpetta.utils.printErrln
 import kotlin.system.exitProcess
 
-class Status : CliktCommand(help = "Show the working tree status") {
+class Status @Inject constructor(private val jenkinsSession: JenkinsSession) :
+    CliktCommand(help = "Show the working tree status") {
+
     private val jobName: String by argument("job_name", "Name of the Job to display")
+
     override fun run() {
-        val jenkinsSession = Jenkins.retrieveSession {
+        val session = jenkinsSession.retrieveSession {
             printErrln("ABORT: No Jenkins instance to connect to")
             exitProcess(1)
         }!!
 
-        val jobInfo = jenkinsSession.api().jobsApi().jobInfo(null, jobName)
+        val jobInfo = session.api().jobsApi().jobInfo(null, jobName)
         val lastBuild = jobInfo.lastBuild()
         val prettyIsBuilding = if(lastBuild.building()) {
             "building"

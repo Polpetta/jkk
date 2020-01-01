@@ -26,8 +26,8 @@ import it.polpetta.config.Resources
 import java.io.FileNotFoundException
 import java.nio.file.Path
 
-object Jenkins {
-    val session: JenkinsClient?
+class JenkinsSession {
+    var session: JenkinsClient?
 
     init {
         var config: Config? = null
@@ -75,8 +75,10 @@ object Jenkins {
         if (credentials != null) {
             jenkinsBuilder.credentials(credentials)
         }
-
-        return jenkinsBuilder.build()
+        jenkinsBuilder.build().let {
+            session = it;
+            return it;
+        }
     }
 
     /**

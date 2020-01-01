@@ -20,20 +20,25 @@
 package it.polpetta
 
 import com.github.ajalt.clikt.core.subcommands
+import com.google.inject.Guice
 import it.polpetta.cli.Login
 import it.polpetta.cli.Root
 import it.polpetta.cli.Status
 import it.polpetta.cli.Version
+import it.polpetta.modules.JkkModule
 import it.polpetta.utils.debugThrow
 import it.polpetta.utils.printErrln
 import kotlin.system.exitProcess
+import dev.misfitlabs.kotlinguice4.getInstance
 
 fun main(args: Array<String>) {
+    val injector = Guice.createInjector(JkkModule())
+
     try {
         Root().subcommands(
-            Version(),
-            Login(),
-            Status()
+            injector.getInstance<Version>(),
+            injector.getInstance<Login>(),
+            injector.getInstance<Status>()
         ).main(args)
     }
     catch (e: Exception) {

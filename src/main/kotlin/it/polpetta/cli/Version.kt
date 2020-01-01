@@ -19,15 +19,14 @@
 package it.polpetta.cli
 
 import com.github.ajalt.clikt.core.CliktCommand
-import it.polpetta.config.Resources
+import com.google.inject.Inject
 import it.polpetta.config.VersionInfo
-import it.polpetta.utils.Jenkins
-import it.polpetta.utils.printErrln
-import kotlin.system.exitProcess
+import it.polpetta.utils.JenkinsSession
 
-class Version: CliktCommand(help = "Prints information about the cli and the server, if logged in") {
+class Version @Inject constructor(private val jenkinsSession: JenkinsSession) :
+    CliktCommand(help = "Prints information about the cli and the server, if logged in") {
     override fun run() {
-        val jenkinsSession = Jenkins.retrieveSession()
+        val jenkinsSession = jenkinsSession.retrieveSession()
 
         if (jenkinsSession != null && jenkinsSession.api().systemApi().systemInfo().jenkinsVersion() != "-1")
         {

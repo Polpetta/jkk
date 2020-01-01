@@ -50,10 +50,12 @@ dependencies {
     compile "jakarta.xml.bind:jakarta.xml.bind-api:2.3.2"
     compile "org.glassfish.jaxb:jaxb-runtime:2.3.2"
     compile 'com.uchuhimo:konf:0.21.0'
+    compile 'dev.misfitlabs.kotlinguice4:kotlin-guice:1.4.1'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.5.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.5.2'
-    testCompile "org.mockito:mockito-core:1.+"
+    testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
+
 }
 
 compileKotlin {

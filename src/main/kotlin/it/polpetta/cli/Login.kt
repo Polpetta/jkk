@@ -22,23 +22,25 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.prompt
+import com.google.inject.Inject
 import com.uchuhimo.konf.Config
 import com.uchuhimo.konf.source.toml.toToml
 import it.polpetta.config.Auth
 import it.polpetta.config.Resources
-import it.polpetta.utils.Jenkins
+import it.polpetta.utils.JenkinsSession
 import it.polpetta.utils.printErrln
 import it.polpetta.utils.pwd
 import java.nio.file.Path
 import kotlin.system.exitProcess
 
-class Login : CliktCommand(help = "Login to the remote Jenkins instance") {
+class Login @Inject constructor(private val jenkinsSession: JenkinsSession) :
+    CliktCommand(help = "Login to the remote Jenkins instance") {
     private val url: String by argument("server_url", "Jenkins server URL")
     private val username: String? by option("-u", "--username", help = "Jenkins username").prompt("Username")
     private val password: String? by option("-p", "--password", help = "Jenkins password/auth token").prompt("Password")
 
     override fun run() {
-        val jenkins = Jenkins.with(url, username, password)
+        val jenkins = jenkinsSession.with(url, username, password)
         val authConfig = Config { addSpec(Auth) }
         val jenkinsVersion = jenkins.api().systemApi().systemInfo().jenkinsVersion()
 
