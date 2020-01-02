@@ -18,6 +18,7 @@
 
 package it.polpetta.cli
 
+import com.cdancy.jenkins.rest.JenkinsClient
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.stub
