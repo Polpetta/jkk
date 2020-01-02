@@ -1,0 +1,53 @@
+targets=(
+    "centos"
+    "fedora"
+    "ubuntu"
+)
+pkgname="jkk"
+pkgver="0.1"
+pkgrel="1"
+pkgdesc="A git-like cli for Jenkins written in Kotlin"
+maintainer="jkk team"
+url="https://github.com/Polpetta/jkk"
+arch="all"
+license=("GPL3")
+section="utils"
+priority="optional"
+sources=(
+    "https://github.com/Polpetta/jkk/archive/master.tar.gz"
+)
+hashsums=(
+    "skip"
+)
+depends:apt=(
+    "openjdk-11-jre-headless"
+)
+depends:yum=(
+    "java-11-openjdk-headless"
+)
+makedepends=(
+    "git" 
+    "gradle"
+)
+
+build() {
+    cd "${srcdir}/${pkgname}-master"
+    gradle install
+}
+
+package() {
+    cd "${srcdir}/${pkgname}-master"/build/
+    
+    install -Dm 755 install/${pkgname}/bin/jkk \
+        -t "${pkgdir}/usr/share/java/${pkgname}/bin"
+    install -Dm 644 install/${pkgname}/lib/* \
+        -t "${pkgdir}/usr/share/java/${pkgname}/lib"
+    install -d "${pkgdir}/usr/bin"
+    ln -s /usr/share/java/${pkgname}/bin/jkk \
+        "${pkgdir}/usr/bin/jkk"
+    
+    install -Dm 644 ../LICENSE \
+        -t "${pkgdir}/usr/share/licenses/${pkgname}"
+    install -Dm 644 ../README.md \
+        -t "${pkgdir}/usr/share/doc/${pkgname}"
+}
