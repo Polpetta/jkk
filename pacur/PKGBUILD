@@ -28,7 +28,6 @@ hashsums=(
 depends:apt=(
     "openjdk-11-jre-headless"
 )
-
 makedepends:apt=(
     "openjdk-11-jre-headless"
 )
@@ -36,8 +35,14 @@ makedepends:apt=(
 depends:yum=(
     "java-11-openjdk-headless"
 )
-
 makedepends:yum=(
+    "java-11-openjdk-devel"
+)
+
+depends:zypper=(
+    "java-11-openjdk-headless"
+)
+makedepends:zypper=(
     "java-11-openjdk-devel"
 )
 
@@ -49,6 +54,12 @@ build:ubuntu() {
 
 build:fedora() {
     export JAVA_HOME=/usr/lib/jvm/java-11-openjdk/
+    cd "${srcdir}/${pkgname}-master"
+    ../gradle-6.0.1/bin/gradle install
+}
+
+build:opensuse() {
+    export JAVA_HOME=/usr/lib64/jvm/java-11-openjdk/
     cd "${srcdir}/${pkgname}-master"
     ../gradle-6.0.1/bin/gradle install
 }
