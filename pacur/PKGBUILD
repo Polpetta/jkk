@@ -1,13 +1,15 @@
 targets=(
     "centos"
     "fedora"
+    "opensuse"
     "ubuntu"
 )
 pkgname="jkk"
 pkgver="0.1"
 pkgrel="1"
 pkgdesc="A git-like cli for Jenkins written in Kotlin"
-maintainer="jkk team"
+pkgdesclong=("A git-like cli for Jenkins written in Kotlin")
+maintainer="JKK Team"
 url="https://github.com/Polpetta/jkk"
 arch="all"
 license=("GPL3")
@@ -17,18 +19,36 @@ sources=(
     "https://github.com/Polpetta/jkk/archive/master.tar.gz"
     "https://downloads.gradle-dn.com/distributions/gradle-6.0.1-bin.zip"
 )
+
 hashsums=(
     "skip"
     "d2620b30787c22830bee1b5c6561877d"
 )
-depends:ubuntu=(
+
+depends:apt=(
     "openjdk-11-jre-headless"
 )
+
+makedepends:apt=(
+    "openjdk-11-jre-headless"
+)
+
 depends:yum=(
     "java-11-openjdk-headless"
 )
 
-build() {
+makedepends:yum=(
+    "java-11-openjdk-devel"
+)
+
+build:ubuntu() {
+    export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+    cd "${srcdir}/${pkgname}-master"
+    ../gradle-6.0.1/bin/gradle install
+}
+
+build:fedora() {
+    export JAVA_HOME=/usr/lib/jvm/java-11-openjdk/
     cd "${srcdir}/${pkgname}-master"
     ../gradle-6.0.1/bin/gradle install
 }
