@@ -27,6 +27,10 @@ If you're lucky enough to use Arch Linux, someone has an AUR package just for yo
 - `cd jkk-git`
 - `makepkg -si`
 
+## Documentation
+
+If you are searching for code documentation, you can find it in the source files 😉. If you are searching for user documentation instead, you can find it [in our wiki](https://github.com/Polpetta/jkk/wiki). No luck? Open an issue and tell us what is missing!
+
 ## License
 The software comes under a GPL 3 or later license. This means you can redistribute the source code using the same license
 as long as you want, provided you keep it open source.  
