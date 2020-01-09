@@ -37,6 +37,7 @@ depends:pacman=(
 )
 makedepends:pacman=(
     "gradle"
+    "unzip"
 )
 
 depends:yum=(
