@@ -1,4 +1,7 @@
+dist: bionic
 language: java
+services:
+  - docker
 
 jdk:
   - openjdk11
@@ -11,3 +14,16 @@ cache:
   directories:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
+
+before_install:
+  - docker pull m0rf30/pacur-archlinux
+  - docker pull m0rf30/pacur-fedora-31
+  - docker pull m0rf30/pacur-opensuse
+  - docker pull m0rf30/pacur-ubuntu-eoan
+
+script:
+  - cd pacur
+  - docker run -v $(pwd):/pacur -ti m0rf30/pacur-archlinux
+  - docker run -v $(pwd):/pacur -ti m0rf30/pacur-fedora-31
+  - docker run -v $(pwd):/pacur -ti m0rf30/pacur-opensuse
+  - docker run -v $(pwd):/pacur -ti m0rf30/pacur-ubuntu-eoan
