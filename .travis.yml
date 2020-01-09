@@ -22,7 +22,8 @@ before_install:
   - docker pull m0rf30/pacur-ubuntu-eoan
 
 script:
-  - cd pacur
+  - mkdir pacur/pkgs
+  - cd pacur/pkgs
   - docker run -v $(pwd):/pacur -ti m0rf30/pacur-archlinux
   - docker run -v $(pwd):/pacur -ti m0rf30/pacur-fedora-31
   - docker run -v $(pwd):/pacur -ti m0rf30/pacur-opensuse
