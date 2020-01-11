@@ -21,7 +21,7 @@ plugins {
 }
 
 group 'it.polpetta'
-version '0.0.1'
+version '0.1'
 
 apply {
     plugin("kotlin")
