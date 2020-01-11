@@ -34,7 +34,7 @@ deploy:
   file: ./*.tar.zst
   file: ./sha256sums
   skip_cleanup: true
-  prerelease: true
+  prerelease: false
   on:
     repo: Polpetta/jkk
     branch: master
