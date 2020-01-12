@@ -19,6 +19,7 @@ sources=(
     "https://github.com/Polpetta/jkk/archive/master.tar.gz"
     "https://downloads.gradle-dn.com/distributions/gradle-6.0.1-bin.zip"
 )
+sources:archlinux=("https://github.com/Polpetta/jkk/archive/master.tar.gz")
 
 hashsums=(
     "skip"
