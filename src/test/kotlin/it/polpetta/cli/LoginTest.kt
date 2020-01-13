@@ -1,54 +1,59 @@
 package it.polpetta.cli
 
-import com.nhaarman.mockitokotlin2.*
+import io.mockk.clearAllMocks
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.slot
 import it.polpetta.api.jenkins.Api
 import it.polpetta.api.jenkins.Version
 import it.polpetta.utils.JenkinsSession
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.Assertions.*
 
 internal class LoginTest{
 
-    private val sessionMock = mock<JenkinsSession>()
-    private val apiMock = mock<Api>()
-    private val versionMock = mock<Version>()
+    private val sessionMock : JenkinsSession = mockk()
+    private val apiMock : Api = mockk()
+    private val versionMock : Version = mockk()
     private val login = Login(sessionMock);
 
-    private val urlCaptor = argumentCaptor<String>()
-    private val userCaptor = argumentCaptor<String>()
-    private val passwordCaptor = argumentCaptor<String>()
+    private val urlSlot = slot<String>()
+    private val userSlot = slot<String>()
+    private val passwordSlot = slot<String>()
 
     @BeforeEach
     fun setUp()
     {
-        sessionMock.stub {
-            on { with(urlCaptor.capture(), userCaptor.capture(), passwordCaptor.capture()) } doReturn apiMock
-        }
-        apiMock.stub {
-            on { getVersion() } doReturn versionMock
-        }
-        versionMock.stub {
-            on { isValid() } doReturn true
-        }
+        clearAllMocks()
+        every {
+            sessionMock.with(capture(urlSlot), capture(userSlot), capture(passwordSlot))
+        } answers { apiMock }
+
+        every {
+            apiMock.getVersion()
+        } answers { versionMock }
+
+        every {
+            versionMock.isValid()
+        } answers { true }
     }
-    //TODO: we need to find a way to manage file system writes and reads
-    //  because now it's just writing to the real file system even when testing
+
     @Test
     fun `with url as an argument`()
     {
         login.main(listOf("https://totallyAJenkinsInstance", "-u username", "-p password"))
-        assertEquals("https://totallyAJenkinsInstance", urlCaptor.firstValue)
-        assertEquals("username", userCaptor.firstValue.trim())
-        assertEquals("password", passwordCaptor.firstValue.trim())
+        assertEquals("https://totallyAJenkinsInstance", urlSlot.captured)
+        assertEquals("username", userSlot.captured.trim())
+        assertEquals("password", passwordSlot.captured.trim())
     }
 
     @Test
     fun `without url as an argument`()
     {
         login.main(listOf("-u username", "-p password"))
-        assertEquals("http://localhost/", urlCaptor.firstValue)
-        assertEquals("username", userCaptor.firstValue.trim())
-        assertEquals("password", passwordCaptor.firstValue.trim())
+        assertEquals("http://localhost/", urlSlot.captured)
+        assertEquals("username", userSlot.captured.trim())
+        assertEquals("password", passwordSlot.captured.trim())
     }
 }

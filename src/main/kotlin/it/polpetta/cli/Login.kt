@@ -43,7 +43,8 @@ class Login @Inject constructor(private val jenkinsSession: JenkinsSession) :
 
     override fun run() {
         var validUrl: String = url.orEmpty()
-        if (url == null || url.isNullOrBlank()) {
+        if (url == null || url.isNullOrBlank())
+        {
             validUrl = "http://localhost/"
             println("No $urlArgName provided, using default url $validUrl")
         }
@@ -51,7 +52,8 @@ class Login @Inject constructor(private val jenkinsSession: JenkinsSession) :
         val authConfig = Config { addSpec(Auth) }
         val jenkinsVersion = jenkins.getVersion()
 
-        if (jenkinsVersion.isValid()) {
+        if (jenkinsVersion.isValid())
+        {
             println("Login succeed, found Jenkins $jenkinsVersion")
 
             authConfig[Auth.username] = username.orEmpty()
@@ -67,7 +69,8 @@ class Login @Inject constructor(private val jenkinsSession: JenkinsSession) :
             authConfig.toToml.toFile(saveFile)
             // TODO we should detect the current VCS used by the user and add the current credential files in the
             //  ignored files, in order to avoid accidentals commits
-        } else {
+        } else
+        {
             printErrln("Login failed")
             exitProcess(1)
         }

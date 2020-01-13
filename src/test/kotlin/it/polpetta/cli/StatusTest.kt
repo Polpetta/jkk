@@ -1,6 +1,8 @@
 package it.polpetta.cli
 
-import com.nhaarman.mockitokotlin2.*
+import io.mockk.clearAllMocks
+import io.mockk.every
+import io.mockk.mockk
 import it.polpetta.api.jenkins.Api
 import it.polpetta.api.jenkins.Build
 import it.polpetta.api.jenkins.Job
@@ -17,11 +19,11 @@ import java.io.PrintStream
 
 internal class StatusTest {
 
-    private val sessionMock = mock<JenkinsSession>()
+    private val sessionMock : JenkinsSession = mockk()
     private val status = Status(sessionMock)
-    private val apiMock = mock<Api>()
-    private val jobMock = mock<Job>()
-    private val buildMock = mock<Build>()
+    private val apiMock : Api = mockk()
+    private val jobMock : Job = mockk()
+    private val buildMock : Build = mockk()
     private val outContent = ByteArrayOutputStream()
     private val errContent = ByteArrayOutputStream()
     private val originalOut = System.out
@@ -30,22 +32,19 @@ internal class StatusTest {
     @BeforeEach
     fun setUp()
     {
-        sessionMock.stub {
-            on { retrieveSession() } doReturn apiMock
-        }
-        apiMock.stub {
-            on { getJob("cook") } doReturn jobMock
-        }
-        jobMock.stub {
-            on { getLastBuild() } doReturn buildMock
-            on { getName() } doReturn "cook"
-        }
+        clearAllMocks()
+        every { sessionMock.retrieveSession() } answers { apiMock }
+        every { apiMock.getJob("cook") } answers { jobMock }
+        every { jobMock.getLastBuild() } answers { buildMock }
+        every { jobMock.getName() } answers { "cook" }
+
         System.setErr(PrintStream(errContent))
         System.setOut(PrintStream(outContent))
     }
 
     @AfterEach
-    fun cleanup() {
+    fun cleanup()
+    {
         System.setErr(originalErr)
         System.setOut(originalOut)
     }
@@ -53,16 +52,14 @@ internal class StatusTest {
     @Test
     fun `building build`()
     {
-        buildMock.stub {
-            on { getStatus() } doReturn Build.Status.BUILDING
-            on { getId() } doReturn 42
-            on { getDuration() } doReturn 1234
-            on { getUrl() } doReturn "http://www.savewalterwhite.com/"
-            on { getTitle() } doReturn "Say my name"
-            on { getDescription() } doReturn "You're goddamn right"
-        }
+        every { buildMock.getStatus() } answers { Build.Status.BUILDING }
+        every { buildMock.getId() } answers { 42 }
+        every { buildMock.getDuration() } answers { 1234 }
+        every { buildMock.getUrl() } answers { "http://www.savewalterwhite.com/" }
+        every { buildMock.getTitle() } answers { "Say my name" }
+        every { buildMock.getDescription() } answers { "You're goddamn right" }
+
         status.main(arrayOf("cook"))
-        //TODO we need to find a better way to test text commands
         assertEquals("""
             Latest build on job cook
             Build id: 42
@@ -79,14 +76,13 @@ internal class StatusTest {
     @Test
     fun `completed build`()
     {
-        buildMock.stub {
-            on { getStatus() } doReturn Build.Status.CANCELLED
-            on { getId() } doReturn 42
-            on { getDuration() } doReturn 1234
-            on { getUrl() } doReturn "http://www.savewalterwhite.com/"
-            on { getTitle() } doReturn "Say my name"
-            on { getDescription() } doReturn "You're goddamn right"
-        }
+        every { buildMock.getStatus() } answers { Build.Status.CANCELLED }
+        every { buildMock.getId() } answers { 42 }
+        every { buildMock.getDuration() } answers { 1234 }
+        every { buildMock.getUrl() } answers { "http://www.savewalterwhite.com/" }
+        every { buildMock.getTitle() } answers { "Say my name" }
+        every { buildMock.getDescription() } answers { "You're goddamn right" }
+
         status.main(arrayOf("cook"))
         assertEquals("""
             Latest build on job cook

@@ -18,9 +18,9 @@
 
 package it.polpetta.cli
 
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.stub
+import io.mockk.clearAllMocks
+import io.mockk.every
+import io.mockk.mockk
 import it.polpetta.config.VersionInfo
 import it.polpetta.utils.JenkinsSession
 import org.junit.jupiter.api.AfterEach
@@ -33,7 +33,7 @@ import java.io.PrintStream
 
 
 internal class VersionTest {
-    private val jenkinsSessionMock = mock<JenkinsSession>()
+    private val jenkinsSessionMock : JenkinsSession = mockk()
     private val version = Version(jenkinsSessionMock)
     private val outContent = ByteArrayOutputStream()
     private val errContent = ByteArrayOutputStream()
@@ -42,6 +42,8 @@ internal class VersionTest {
 
     @BeforeEach
     fun setup_all() {
+        clearAllMocks()
+
         System.setErr(PrintStream(errContent))
         System.setOut(PrintStream(outContent))
     }
@@ -57,9 +59,7 @@ internal class VersionTest {
     fun `Version formatting before login`()
     {
         //Example test, this is not really a command worth testing
-        jenkinsSessionMock.stub {
-            on { retrieveSession() } doReturn null
-        }
+        every { jenkinsSessionMock.retrieveSession() } answers { null }
         version.run()
         assertEquals("""
             Version: ${VersionInfo.NUMBER}
