@@ -33,7 +33,7 @@ deploy:
   file: ./*.rpm
   file: ./*.tar.zst
   file: ./sha256sums
-  skip_cleanup: true
+  cleanup: false
   prerelease: false
   on:
     repo: Polpetta/jkk
