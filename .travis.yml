@@ -38,4 +38,4 @@ deploy:
   on:
     repo: Polpetta/jkk
     branch: master
-    tags: false
+    tags: true
