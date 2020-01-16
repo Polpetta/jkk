@@ -18,16 +18,18 @@
 
 package it.polpetta.utils
 
+import com.google.inject.Inject
 import com.uchuhimo.konf.Config
 import com.uchuhimo.konf.source.toml
 import it.polpetta.api.jenkins.Api
 import it.polpetta.config.Auth
 import it.polpetta.config.Resources
+import it.polpetta.files.FileHandler
 import java.io.FileNotFoundException
 import java.net.URI
 import java.nio.file.Path
 
-class JenkinsSession {
+class JenkinsSession @Inject constructor(private val fileHandler : FileHandler) {
 /**
  * Manage the current Jenkins session, retrieving URL, username and password at boot time from the local repository
  * configuration. It gives the possibility to return an [Api] session.
@@ -36,7 +38,7 @@ class JenkinsSession {
     val session: Api?
     init {
         var config: Config? = null
-        if (Path.of(pwd(), Resources.JENKINS_AUTH_FILENAME).toFile().exists()) {
+        if (fileHandler.exists(Path.of(pwd(), Resources.JENKINS_AUTH_FILENAME))) {
             try {
                 config = Config { addSpec(Auth) }.from.toml.file(
                     Path.of(

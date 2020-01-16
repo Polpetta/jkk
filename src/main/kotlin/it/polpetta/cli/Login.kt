@@ -28,20 +28,22 @@ import com.uchuhimo.konf.Config
 import com.uchuhimo.konf.source.toml.toToml
 import it.polpetta.config.Auth
 import it.polpetta.config.Resources
+import it.polpetta.files.FileHandler
 import it.polpetta.utils.JenkinsSession
 import it.polpetta.utils.printErrln
 import it.polpetta.utils.pwd
 import java.nio.file.Path
 import kotlin.system.exitProcess
 
-class Login @Inject constructor(private val jenkinsSession: JenkinsSession) :
+class Login @Inject constructor(private val jenkinsSession: JenkinsSession, private val fileHandler: FileHandler) :
     CliktCommand(help = "Login to the remote Jenkins instance") {
     private val urlArgName: String = "server_url"
     private val url: String? by argument(urlArgName, "Jenkins server URL").optional()
     private val username: String? by option("-u", "--username", help = "Jenkins username").prompt("Username")
     private val password: String? by option("-p", "--password", help = "Jenkins password/auth token").prompt("Password")
 
-    override fun run() {
+    override fun run()
+    {
         var validUrl: String = url.orEmpty()
         if (url == null || url.isNullOrBlank())
         {
@@ -60,16 +62,18 @@ class Login @Inject constructor(private val jenkinsSession: JenkinsSession) :
             authConfig[Auth.password] = password.orEmpty()
             authConfig[Auth.url] = validUrl
 
-            val saveFile = Path.of(pwd(), Resources.JENKINS_AUTH_FILENAME).toFile()
-            if (saveFile.exists()) {
-                saveFile.delete()
-            } else {
-                saveFile.createNewFile()
+            val saveFile = Path.of(pwd(), Resources.JENKINS_AUTH_FILENAME)
+            if (fileHandler.exists(saveFile))
+            {
+                fileHandler.rm(saveFile)
             }
-            authConfig.toToml.toFile(saveFile)
+            fileHandler.touch(saveFile)
+            fileHandler.write(saveFile, authConfig.toToml.toText().byteInputStream())
+
             // TODO we should detect the current VCS used by the user and add the current credential files in the
             //  ignored files, in order to avoid accidentals commits
-        } else
+        }
+        else
         {
             printErrln("Login failed")
             exitProcess(1)

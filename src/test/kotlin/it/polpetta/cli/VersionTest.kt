@@ -41,15 +41,16 @@ internal class VersionTest {
     private val originalErr = System.err
 
     @BeforeEach
-    fun setup_all() {
+    fun setup_all()
+    {
         clearAllMocks()
-
         System.setErr(PrintStream(errContent))
         System.setOut(PrintStream(outContent))
     }
 
     @AfterEach
-    fun cleanup_all() {
+    fun cleanup_all()
+    {
         System.setErr(originalErr)
         System.setOut(originalOut)
     }

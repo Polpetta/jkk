@@ -6,9 +6,11 @@ import io.mockk.mockk
 import io.mockk.slot
 import it.polpetta.api.jenkins.Api
 import it.polpetta.api.jenkins.Version
+import it.polpetta.files.FileHandler
 import it.polpetta.utils.JenkinsSession
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 internal class LoginTest{
@@ -16,7 +18,8 @@ internal class LoginTest{
     private val sessionMock : JenkinsSession = mockk()
     private val apiMock : Api = mockk()
     private val versionMock : Version = mockk()
-    private val login = Login(sessionMock);
+    private val fileHandler : FileHandler = mockk(relaxed = true)
+    private val login = Login(sessionMock, fileHandler)
 
     private val urlSlot = slot<String>()
     private val userSlot = slot<String>()
@@ -39,21 +42,67 @@ internal class LoginTest{
         } answers { true }
     }
 
-    @Test
-    fun `with url as an argument`()
+    @Nested
+    inner class `Argument URL`()
     {
-        login.main(listOf("https://totallyAJenkinsInstance", "-u username", "-p password"))
-        assertEquals("https://totallyAJenkinsInstance", urlSlot.captured)
-        assertEquals("username", userSlot.captured.trim())
-        assertEquals("password", passwordSlot.captured.trim())
+        @BeforeEach
+        fun classSetup()
+        {
+            fileHandler.apply {
+                every {
+                    exists(any())
+                } answers { true }
+            }
+        }
+
+        @Test
+        fun `it should take that argument as URL`()
+        {
+            login.main(listOf("https://totallyAJenkinsInstance", "-u username", "-p password"))
+            assertEquals(
+                AuthParams("https://totallyAJenkinsInstance", "username", "password"),
+                AuthParams(urlSlot.captured, userSlot.captured.trim(), passwordSlot.captured.trim())
+            )
+        }
+
+        @Test
+        fun `without url as an argument it should take localhost as default host`()
+        {
+            login.main(listOf("-u username", "-p password"))
+            assertEquals(
+                AuthParams("http://localhost/", "username", "password"),
+                AuthParams(urlSlot.captured, userSlot.captured.trim(), passwordSlot.captured.trim())
+            )
+        }
     }
 
-    @Test
-    fun `without url as an argument`()
+    @Nested
+    inner class `Config file`
     {
-        login.main(listOf("-u username", "-p password"))
-        assertEquals("http://localhost/", urlSlot.captured)
-        assertEquals("username", userSlot.captured.trim())
-        assertEquals("password", passwordSlot.captured.trim())
+        @Test
+        fun `it already exists`()
+        {
+            every {
+                fileHandler.exists(any())
+            } answers { true }
+            login.main(listOf("https://totallyAJenkinsInstance", "-u username", "-p password"))
+            
+        }
+
+        @Test
+        fun `it doesn't exists`()
+        {
+            every {
+                fileHandler.exists(any())
+            } answers { false }
+            login.main(listOf("https://totallyAJenkinsInstance", "-u username", "-p password"))
+
+        }
     }
+
+    data class AuthParams(
+        val url: String,
+        val username: String,
+        val password: String
+    )
 }
