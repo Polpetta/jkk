@@ -1,5 +1,8 @@
 dist: bionic
 language: java
+env:
+  global:
+    - PACUR_TAG=0.5
 services:
   - docker
 jdk:
@@ -13,17 +16,17 @@ cache:
     - "$HOME/.gradle/caches/"
     - "$HOME/.gradle/wrapper/"
 before_install:
-  - docker pull m0rf30/pacur-archlinux
-  - docker pull m0rf30/pacur-fedora-31
-  - docker pull m0rf30/pacur-opensuse
-  - docker pull m0rf30/pacur-ubuntu-eoan
+  - docker pull m0rf30/pacur-archlinux:$PACUR_TAG
+  - docker pull m0rf30/pacur-fedora-31:$PACUR_TAG
+  - docker pull m0rf30/pacur-opensuse:0:$PACUR_TAG
+  - docker pull m0rf30/pacur-ubuntu-eoan:$PACUR_TAG
 script:
   - cd pacur
-  - docker run -v $(pwd):/pacur -ti m0rf30/pacur-archlinux
-  - docker run -v $(pwd):/pacur -ti m0rf30/pacur-fedora-31
-  - docker run -v $(pwd):/pacur -ti m0rf30/pacur-opensuse
-  - docker run -v $(pwd):/pacur -ti m0rf30/pacur-ubuntu-eoan
-  - for i in $(ls); do sha256sum $i >> sha256sums; done
+  - docker run -v $(pwd):/pacur -ti m0rf30/pacur-archlinux:$PACUR_TAG
+  - docker run -v $(pwd):/pacur -ti m0rf30/pacur-fedora-31:$PACUR_TAG
+  - docker run -v $(pwd):/pacur -ti m0rf30/pacur-opensuse:$PACUR_TAG
+  - docker run -v $(pwd):/pacur -ti m0rf30/pacur-ubuntu-eoan:$PACUR_TAG
+  - for i in $(ls); do sha256sum $i >> SHA256SUMS; done
 deploy:
   provider: releases
   api_key:
@@ -32,7 +35,7 @@ deploy:
   file: ./*.deb
   file: ./*.rpm
   file: ./*.tar.zst
-  file: ./sha256sums
+  file: ./SHA256SUMS
   cleanup: false
   prerelease: false
   on:
