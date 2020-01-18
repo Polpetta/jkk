@@ -1,17 +1,19 @@
 package it.polpetta.cli
 
-import io.mockk.clearAllMocks
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.slot
+import io.mockk.*
 import it.polpetta.api.jenkins.Api
 import it.polpetta.api.jenkins.Version
+import it.polpetta.config.Resources
 import it.polpetta.files.FileHandler
 import it.polpetta.utils.JenkinsSession
+import it.polpetta.utils.pwd
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import java.io.InputStream
+import java.nio.file.Path
+import org.assertj.core.api.Assertions.*
 
 internal class LoginTest{
 
@@ -20,6 +22,7 @@ internal class LoginTest{
     private val versionMock : Version = mockk()
     private val fileHandler : FileHandler = mockk(relaxed = true)
     private val login = Login(sessionMock, fileHandler)
+    private val configPath = Path.of(pwd(), Resources.JENKINS_AUTH_FILENAME)
 
     private val urlSlot = slot<String>()
     private val userSlot = slot<String>()
@@ -69,6 +72,7 @@ internal class LoginTest{
         fun `without url as an argument it should take localhost as default host`()
         {
             login.main(listOf("-u username", "-p password"))
+
             assertEquals(
                 AuthParams("http://localhost/", "username", "password"),
                 AuthParams(urlSlot.captured, userSlot.captured.trim(), passwordSlot.captured.trim())
@@ -77,26 +81,41 @@ internal class LoginTest{
     }
 
     @Nested
-    inner class `Config file`
+    inner class `Config file test`
     {
         @Test
         fun `it already exists`()
         {
             every {
-                fileHandler.exists(any())
+                fileHandler.exists(configPath)
             } answers { true }
             login.main(listOf("https://totallyAJenkinsInstance", "-u username", "-p password"))
-            
+
+            verifyOrder {
+                fileHandler.exists(configPath)
+                fileHandler.rm(configPath)
+                fileHandler.touch(configPath)
+                fileHandler.write(configPath, any())
+            }
+
+            confirmVerified(fileHandler)
         }
 
         @Test
         fun `it doesn't exists`()
         {
             every {
-                fileHandler.exists(any())
+                fileHandler.exists(configPath)
             } answers { false }
             login.main(listOf("https://totallyAJenkinsInstance", "-u username", "-p password"))
+            verifyOrder {
+                fileHandler.exists(configPath)
+                fileHandler.touch(configPath)
+                fileHandler.write(configPath, any())
+            }
 
+            verify(exactly = 0) { fileHandler.rm(configPath) }
+            confirmVerified(fileHandler)
         }
     }
 
