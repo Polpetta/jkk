@@ -92,13 +92,10 @@ internal class LoginTest{
             login.main(listOf("https://totallyAJenkinsInstance", "-u username", "-p password"))
 
             verifyOrder {
-                fileHandler.exists(configPath)
                 fileHandler.rm(configPath)
                 fileHandler.touch(configPath)
                 fileHandler.write(configPath, any())
             }
-
-            confirmVerified(fileHandler)
         }
 
         @Test
@@ -108,14 +105,13 @@ internal class LoginTest{
                 fileHandler.exists(configPath)
             } answers { false }
             login.main(listOf("https://totallyAJenkinsInstance", "-u username", "-p password"))
+            
             verifyOrder {
-                fileHandler.exists(configPath)
                 fileHandler.touch(configPath)
                 fileHandler.write(configPath, any())
             }
 
             verify(exactly = 0) { fileHandler.rm(configPath) }
-            confirmVerified(fileHandler)
         }
     }
 
