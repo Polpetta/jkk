@@ -69,14 +69,21 @@ compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
 
-jar {
+task standalone(type: Jar) {
+    dependsOn configurations.runtimeClasspath
+    archiveClassifier = 'standalone'
+    from sourceSets.main.output
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    from(configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }) {
+        exclude "META-INF/*.SF"
+        exclude "META-INF/*.DSA"
+        exclude "META-INF/*.RSA"
+    }
     manifest {
         attributes 'Implementation-Title': 'JKK: A git-like cli for Jenkins written in Kotlin',
-                   'Main-Class': 'it.polpetta.Cli'
+                'Built-By': System.getProperty('user.name'),
+                'Built-Date': new Date(),
+                'Built-JDK': System.getProperty('java.version'),
+                'Main-Class': 'it.polpetta.Cli'
     }
-    from {
-        configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    }
-    exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA'
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
