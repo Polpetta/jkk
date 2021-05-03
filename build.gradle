@@ -50,7 +50,7 @@ repositories {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    implementation "com.github.ajalt:clikt:2.3.0"
+    implementation "com.github.ajalt:clikt:2.8.0"
     implementation 'com.uchuhimo:konf:0.22.1'
     implementation 'dev.misfitlabs.kotlinguice4:kotlin-guice:1.4.1'
     implementation 'com.offbytwo.jenkins:jenkins-client:0.3.8'
