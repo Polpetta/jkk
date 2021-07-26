@@ -54,7 +54,7 @@ dependencies {
     implementation 'com.uchuhimo:konf:0.22.1'
     implementation 'dev.misfitlabs.kotlinguice4:kotlin-guice:1.4.1'
     implementation 'com.offbytwo.jenkins:jenkins-client:0.3.8'
-    implementation group: 'org.slf4j', name: 'slf4j-nop', version: '1.7.30'
+    implementation group: 'org.slf4j', name: 'slf4j-nop', version: '1.7.32'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.5.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.5.2'
